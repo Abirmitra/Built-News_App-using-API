@@ -1,2 +1,147 @@
 # Built-News_App-using-API
-A simple web application built with HTML, CSS, and JavaScript that fetches and displays the latest news headlines using the Mediastack News API.
+>A simple web application built with HTML, CSS, and JavaScript that fetches and displays the latest news headlines using the Mediastack News API.
+# Features
+>User can select a specific date to view news from that day.
+>Fetches real-time news headlines and descriptions for India (country=in).
+>Provides clickable links to full articles.
+>Clean, responsive UI with easy navigation.
+# How it works
+>Enter/select a date.
+>The app makes an API call to Mediastack.
+>Displays news headlines, summaries, and links dynamically.
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News App</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      background: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .news-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      width: 700px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    input, button {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    input {
+      width: 60%;
+    }
+    button {
+      background: #4a90e2;
+      color: #fff;
+      border: none;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #357ab8;
+    }
+    .news-list {
+      margin-top: 20px;
+    }
+    .news-item {
+      background: #f9fafb;
+      padding: 15px;
+      margin-bottom: 12px;
+      border-left: 5px solid #4a90e2;
+      border-radius: 8px;
+    }
+    .news-item h3 {
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+      color: #111;
+    }
+    .news-item p {
+      color: #444;
+      font-size: 0.95rem;
+    }
+    .news-item a {
+      color: #4a90e2;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .news-item a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="news-container">
+    <h1>News App</h1>
+    <div style="text-align:center; margin-bottom:20px;">
+      <input type="date" id="dateInput">
+      <button onclick="getNews()">Get News</button>
+    </div>
+    <div class="news-list" id="newsList"></div>
+  </div>
+
+  <script>
+    async function getNews() {
+      const date = document.getElementById("dateInput").value;
+      const newsList = document.getElementById("newsList");
+      newsList.innerHTML = "Loading news...";
+
+      if (!date) {
+        newsList.innerHTML = "Please select a date.";
+        return;
+      }
+
+      const apiKey = "5890a2a64fb1f16e723f48f0748c9869"; 
+      const url = `https://api.mediastack.com/v1/news?access_key=${apiKey}&countries=in&date=${date}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Failed to fetch news");
+
+        const data = await response.json();
+        if (!data.data || data.data.length === 0) {
+          newsList.innerHTML = "No news found for this date.";
+          return;
+        }
+
+        newsList.innerHTML = "";
+        data.data.forEach(article => {
+          const div = document.createElement("div");
+          div.className = "news-item";
+          div.innerHTML = `
+            <h3>${article.title || "No Title"}</h3>
+            <p>${article.description || "No description available."}</p>
+            <a href="${article.url}" target="_blank">Read more</a>
+          `;
+          newsList.appendChild(div);
+        });
+      } catch (error) {
+        newsList.innerHTML = "Error fetching news. Please try again.";
+      }
+    }
+  </script>
+</body>
+</html>
